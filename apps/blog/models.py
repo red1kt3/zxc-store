@@ -12,6 +12,20 @@ class BlogCategory(models.Model):
         verbose_name_plural = 'Категории'
 
 
+class Tag(models.Model):
+
+    tags = models.CharField(verbose_name='Тэг', max_length=40)
+
+
+    def __str__(self):
+        return self.tags
+
+
+    class Meta:
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
+
+
 class Article(models.Model):
     category = models.ForeignKey(
         to=BlogCategory,
@@ -24,6 +38,7 @@ class Article(models.Model):
     text = models.TextField(verbose_name='Текст')
     created_at = models.DateTimeField(verbose_name='Время создания', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='Время обновления', auto_now=True)
+    tags = models.ManyToManyField(to=Tag, verbose_name='Тэг', blank=True)
 
     def __str__(self):
         return self.title
