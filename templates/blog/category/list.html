@@ -1,8 +1,26 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
     <h1>Категории</h1>
-    {% for category in categories %}
-        <h4><a href="{% url 'article_list' category_id=category.id %}">{{ category }}</a></h4>
-    {% endfor %}
+    <div class="row">
+        {% for category in categories %}
+
+            <div class="col-4 blog-item">
+            <a href="{% url 'article_list' category_id=category.id %}">
+                {% if category.image %}
+                    <img class='img-thumbnail' src="{{ category.image.url }}" alt="{{ category }}" title="{{ category }}">
+                {% else %}
+                    <img class='img-thumbnail' src="{% static 'no-image.png' %}" alt="{{ category }}" title="{{ category }}">
+
+                {% endif %}
+
+                <h4>{{ category }}</h4>
+             </a>
+            </div>
+
+
+        {% endfor %}
+    </div>
+
 {% endblock %}
 
