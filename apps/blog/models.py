@@ -2,6 +2,8 @@ from django.db import models
 from django.utils.safestring import mark_safe
 from imagekit.models import ProcessedImageField, ImageSpecField
 from pilkit.processors import ResizeToFill
+
+from apps.user.models import User
 from config.settings import MEDIA_ROOT
 
 class BlogCategory(models.Model):
@@ -61,12 +63,20 @@ class Article(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
+    user = models.ForeignKey(
+        to=User,
+        verbose_name='Автор',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
     title = models.CharField(verbose_name='Заголовок', max_length=255)
     text_preview = models.TextField(verbose_name='Текст-превью')
     text = models.TextField(verbose_name='Текст')
     created_at = models.DateTimeField(verbose_name='Время создания', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='Время обновления', auto_now=True)
     tags = models.ManyToManyField(to=Tag, verbose_name='Тэг', blank=True)
+
 
     def image_tag_thumbnail(self):
         if self.image:

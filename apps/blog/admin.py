@@ -29,11 +29,12 @@ class BlogCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'created_at', 'category_link', 'image_tag_thumbnail', 'tags_link']
+    list_display = ['id', 'title', 'created_at', 'category_link', 'image_tag_thumbnail', 'tags_link', 'user']
     list_display_links = ['id', 'title', 'image_tag_thumbnail']
-    fields = ['category', 'tags', 'title', 'text_preview', 'text', 'image_tag', 'image']
+    fields = ['category', 'tags', 'title', 'text_preview', 'text', 'image_tag', 'image', 'user']
     readonly_fields = ['image_tag']
     list_filter = ['category', 'tags']
+
 
     def category_link(self, obj):
         if obj.category:
