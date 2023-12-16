@@ -6,6 +6,21 @@
 
     {% endif %}
     <p>{{ article.text }}</p>
+    {% if article.user %}
+        <h2>Автор:</h2>
+        <p>
+        <h4>
+
+
+            {{ article.user.first_name }}
+            {{ article.user.last_name }}
+        </h4>
+            {% if article.user.image_tag_thumbnail %}
+                {{ article.user.image_tag_thumbnail }}
+            {% endif %}
+        </p>
+    {% endif %}
+
     <p>
         {% for tag in article.tags.all %}
             <a href='{% url 'tags_to_articles' tag_id=tag.id %}'>#{{ tag.tags }}</a>
