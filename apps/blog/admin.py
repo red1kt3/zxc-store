@@ -29,7 +29,7 @@ class BlogCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'created_at', 'category_link', 'image_tag_thumbnail']
+    list_display = ['id', 'title', 'created_at', 'category_link', 'image_tag_thumbnail', 'tags_link']
     list_display_links = ['id', 'title', 'image_tag_thumbnail']
     fields = ['category', 'tags', 'title', 'text_preview', 'text', 'image_tag', 'image']
     readonly_fields = ['image_tag']
@@ -41,3 +41,16 @@ class ArticleAdmin(admin.ModelAdmin):
             return format_html(f"<a href='{url}'>{obj.category.name}</a>")
 
     category_link.short_description = 'Категория'
+
+    def tags_link(self, obj):
+        tags = obj.tags.all()
+        if tags:
+            tags_view = ''
+            for tag in tags:
+                url = reverse('admin:blog_tag_change', args=[tag.id])
+                tags_view += f"<a href = '{url}'>{tag.tags}</a> <br>"
+            return format_html(tags_view)
+
+
+
+    tags_link.short_description = 'Тэги'
