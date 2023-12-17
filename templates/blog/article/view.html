@@ -10,14 +10,17 @@
         <h2>Автор:</h2>
         <p>
         <h4>
+            {% if article.user.image_tag_thumbnail %}
+                <span class="avatar">
+                    <img src="{{ article.user.image_thumbnail.url }}" alt="">
+                </span>
+            {% endif %}
 
 
             {{ article.user.first_name }}
             {{ article.user.last_name }}
         </h4>
-            {% if article.user.image_tag_thumbnail %}
-                {{ article.user.image_tag_thumbnail }}
-            {% endif %}
+
         </p>
     {% endif %}
 
