@@ -60,6 +60,33 @@ class Category(MPTTModel):
         return reverse('category', args=[self.slug])
 
 
+class Images(models.Model):
+    image = ProcessedImageField(
+        verbose_name='Изображение',
+        upload_to='catalog/',
+        processors=[ResizeToFill(600, 400)],
+        format='JPEG',
+        options={'quality': 100},
+        blank=True,
+        null=True,
+    )
+
+    def image_tag_thumbnail(self):
+        if self.image:
+            return mark_safe(f"<img src='/{MEDIA_ROOT}{self.image}' width='100'>")
+
+    image_tag_thumbnail.short_description = 'Текущее изображение'
+    image_tag_thumbnail.allow_tags = True
+
+    def image_tag(self):
+        if self.image:
+            return mark_safe(f"<img src='/{MEDIA_ROOT}{self.image}' width='400'>")
+
+    image_tag.short_description = 'Текущее изображение'
+    image_tag.allow_tags = True
+
+
+
 class Product(models.Model):
     name = models.CharField(verbose_name='Продукт', max_length=255)
     description = models.TextField(verbose_name='Описание товара', null=True)
@@ -67,6 +94,22 @@ class Product(models.Model):
     price = models.DecimalField(verbose_name='Цена', max_digits=12, decimal_places=2, default=0)
     created_at = models.DateTimeField(verbose_name='Время создания', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='Время обновления', auto_now=True)
+    images = models.ManyToManyField(
+        to=Images,
+        through='ProductImages',
+        verbose_name='Картинки',
+        related_name='images',
+        blank=True
+
+
+    )
+    categories = models.ManyToManyField(
+        to=Category,
+        verbose_name='Категории',
+        through='ProductCategory',
+        related_name='categories',
+        blank=True
+    )
 
     class Meta:
         verbose_name = 'Продукт'
@@ -75,6 +118,50 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+
+
+class ProductCategory(models.Model):
+    product = models.ForeignKey(to=Product, verbose_name='Товар', on_delete=models.CASCADE)
+    category = models.ForeignKey(to=Category, verbose_name='Категория', on_delete=models.CASCADE)
+    is_main = models.BooleanField(verbose_name='Основная Категория', default=False)
+
+    def __str__(self):
+        return ''
+
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+
+        if self.is_main:
+            ProductCategory.objects.filter(product=self.product).update(is_main=False)
+        super(ProductCategory, self).save(force_insert, force_update, update_fields)
+
+    class Meta:
+        verbose_name = 'Категория товара'
+        verbose_name_plural = "Категории товара"
+
+
+class ProductImages(models.Model):
+    product = models.ForeignKey(to=Product, verbose_name='Товар', on_delete=models.CASCADE)
+    image = models.ForeignKey(to=Images, verbose_name='Картинки', on_delete=models.CASCADE)
+
+    is_main = models.BooleanField(verbose_name='Основная Картинка', default=False)
+
+    def __str__(self):
+        return ''
+
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+
+        if self.is_main:
+            ProductImages.objects.filter(product=self.product).update(is_main=False)
+        super(ProductImages, self).save(force_insert, force_update, update_fields)
+
+    class Meta:
+        verbose_name = 'Фото товара'
+
 
 
 
