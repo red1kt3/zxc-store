@@ -3,8 +3,11 @@ from apps.catalog.models import Category, Product, Image
 
 
 @admin.register(Category)
-class CategoryADMIN(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ['name']}
+    readonly_fields = ['image_tag']
+    fields = ['name', 'slug', 'parent', 'description', 'image_tag', 'image', 'meta_title', 'meta_description',
+              'meta_keywords' ]
 
 
 class ProductCategoryInLine(admin.TabularInline):
@@ -22,6 +25,7 @@ class ImageInline(admin.TabularInline):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'price', 'quantity',]
+    fields = ['name', 'description', 'price', 'quantity', 'meta_title', 'meta_description', 'meta_keywords']
     inlines = [ProductCategoryInLine, ImageInline]
     list_display_links = ['id', 'name', 'price', 'quantity']
 
