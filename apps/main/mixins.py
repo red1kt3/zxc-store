@@ -1,4 +1,6 @@
 from django.db import models
+from django.urls import reverse
+from django.views import generic
 
 
 class MetaTagMixin(models.Model):
@@ -14,3 +16,29 @@ class MetaTagMixin(models.Model):
         if self.meta_title:
             return self.meta_title
         return self.name
+
+
+class ListViewBreadcrumbsMixin(generic.ListView):
+    breadcrumbs = {}
+
+    def set_breadcrumbs(self):
+        return self.breadcrumbs
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs'] = self.set_breadcrumbs()
+        return context
+
+
+class DetailViewBreadcrumbsMixin(generic.DetailView):
+    breadcrumbs = {}
+
+    def set_breadcrumbs(self):
+        return self.breadcrumbs
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs'] = self.set_breadcrumbs()
+        return context

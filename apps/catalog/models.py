@@ -145,6 +145,12 @@ class Product(MetaTagMixin):
     def get_absolute_url(self):
         return reverse('product', kwargs={'pk': self.id})
 
+    def main_category(self):
+        category = self.categories.filter(categories__productcategory__is_main=True)
+        if category:
+            return True
+        return self.categories.first()
+
 
 
 
