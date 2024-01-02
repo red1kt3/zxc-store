@@ -146,9 +146,9 @@ class Product(MetaTagMixin):
         return reverse('product', kwargs={'pk': self.id})
 
     def main_category(self):
-        category = self.categories.filter(categories__productcategory__is_main=True)
+        category = self.categories.filter(productcategory__is_main=True).first()
         if category:
-            return True
+            return category
         return self.categories.first()
 
 
