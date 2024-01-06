@@ -54,19 +54,6 @@
             </div>
 
 
-            {% if request.user.is_authenticated %}
-                <p class="text-danger text-end">
-                    <a href="{% url 'cart_view' %}" class="text-danger">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" fill="currentColor" class="bi bi-bag"
-                             viewBox="0 0 16 16">
-                            <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
-                        </svg>
-                    </a>
-
-                </p>
-
-            {% endif %}
-
         </div>
     </div>
 </div>
@@ -89,9 +76,23 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'catalog' %}">Каталог</a>
                         </li>
+
                     </ul>
                 </div>
+
             </div>
+            {% if request.user.is_authenticated %}
+                <p class="text-danger text-end">
+                    <a href="{% url 'cart_view' %}" class="text-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" fill="currentColor" class="bi bi-bag"
+                             viewBox="0 0 16 16">
+                            <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"/>
+                        </svg>
+                    </a>
+
+                </p>
+
+            {% endif %}
         </nav>
     </div>
 </div>
@@ -102,5 +103,20 @@
     {% block content %}
     {% endblock %}
 </div>
+
+<footer id="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <br>
+                <br>
+                <hr>
+            </div>
+            <div class="col">
+                <p class="text-center text-info">Все права защищены, правда неизвестно кем)</p>
+            </div>
+        </div>
+    </div>
+</footer>
 </body>
 </html>
