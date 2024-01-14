@@ -30,3 +30,15 @@ class Order(models.Model):
         verbose_name_plural = 'Заказы'
 
 
+class OrderProduct(models.Model):
+    product = models.ForeignKey(to=Product, verbose_name='Товар', on_delete=models.CASCADE)
+    order = models.ForeignKey(to=Order, verbose_name='Заказ', on_delete=models.CASCADE)
+
+    quantity = models.IntegerField(verbose_name='Количество')
+    price = models.DecimalField(verbose_name='Цена', max_digits=12, decimal_places=2, default=0)
+
+
+    class Meta:
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
+
