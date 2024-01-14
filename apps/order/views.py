@@ -1,9 +1,10 @@
+from django.db import transaction
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
 from apps.catalog.models import Product
 from apps.order.forms import AddToCartForm, CreateOrderForm
-from apps.order.models import Cart
+from apps.order.models import Cart, OrderProduct
 from django.views import generic
 
 
@@ -13,6 +14,12 @@ def get_cart_data(user):
     for row in cart:
         total += row.product.price * row.quantity
     return {'cart': cart, 'total': total}
+
+
+def check_quantity(quantity, product):
+    if quantity > product.quantity:
+        return product.quantity
+    return quantity
 
 
 @login_required
@@ -28,8 +35,10 @@ def add_to_card(request):
 
             row = Cart.objects.filter(product=cd['product'], user=cd['user']).first()
             if row:
-                Cart.objects.filter(id=row.id).update(quantity=row.quantity + cd['quantity'])
+                quantity = row.quantity + cd['quantity']
+                Cart.objects.filter(id=row.id).update(quantity=check_quantity(quantity, cd['product']))
             else:
+                form.quantity = check_quantity(cd['quantity'], cd['product'])
                 form.save()
             request.session['cart_token'] = data.get('csrfmiddlewaretoken')
         return render(request, 'order/added.html', {'product': cd['product'],
@@ -55,8 +64,17 @@ def create_order(request):
         request.POST = data
         form = CreateOrderForm(request.POST)
         if form.is_valid():
-            form.save()
-            Cart.objects.filter(user=user).delete()
+            with transaction.atomic():
+                order = form.save()
+                for row in cart['cart']:
+                    OrderProduct.objects.create(
+                        order=order,
+                        product=row.product,
+                        quantity=check_quantity(row.quantity, row.product),
+                        price=row.product.price
+                    )
+                    Product.objects.filter(id=row.product.id).update(quantity=row.product.quantity - check_quantity(row.quantity, row.product))
+                Cart.objects.filter(user=user).delete()
             return render(request, 'order/created.html')
         error = form.errors
     else:
@@ -67,3 +85,12 @@ def create_order(request):
             'phone': user.phone if user.first_name else '',
         })
     return render(request, 'order/create.html', {'cart': cart, 'form': form, 'error': error})
+
+
+@login_required
+def remove_from_cart(request, row_id):
+    Cart.objects.filter(id=row_id).delete()
+    return render(request, 'order/added.html', {'cart': get_cart_data(request.user)})
+
+
+
