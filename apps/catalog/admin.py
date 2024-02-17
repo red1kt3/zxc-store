@@ -7,7 +7,7 @@ class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ['name']}
     readonly_fields = ['image_tag']
     fields = ['name', 'slug', 'parent', 'description', 'image_tag', 'image', 'meta_title', 'meta_description',
-              'meta_keywords' ]
+              'meta_keywords']
 
 
 class ProductCategoryInLine(admin.TabularInline):
@@ -24,10 +24,11 @@ class ImageInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'price', 'quantity',]
-    fields = ['name', 'description', 'price', 'quantity', 'meta_title', 'meta_description', 'meta_keywords']
+    fields = ['name', 'description', 'price', 'quantity', 'user', 'is_checked', 'meta_title', 'meta_description',
+              'meta_keywords']
+    list_display = ['id', 'name', 'user', 'quantity', 'price', 'is_checked']
+    list_display_links = ['id', 'name']
     inlines = [ProductCategoryInLine, ImageInline]
-    list_display_links = ['id', 'name', 'price', 'quantity']
 
 
 
