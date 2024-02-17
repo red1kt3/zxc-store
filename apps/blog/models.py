@@ -67,7 +67,8 @@ class Article(MetaTagMixin):
         to=BlogCategory,
         verbose_name='Категория',
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        blank=True
     )
     user = models.ForeignKey(
         to=User,
