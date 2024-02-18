@@ -1,12 +1,21 @@
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, viewsets, status
+from rest_framework.response import Response
 
-from apps.api.blog.serializers import ArticleSerializer
-from apps.blog.models import Article
+from apps.api.blog.serializers import ArticleReadSerializer, ArticleWriteSerializer
+from apps.blog.models import Article, Tag
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = ArticleSerializer
+    serializer_class = ArticleReadSerializer
+
+    def get_serializer_class(self):
+        if self.action in ['create', 'update']:
+            return ArticleWriteSerializer
+        return self.serializer_class
+
+
+
 
     def get_queryset(self):
         queryset = Article.objects.all()
@@ -19,9 +28,43 @@ class ArticleViewSet(viewsets.ModelViewSet):
             pass
         return queryset
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+
+    @staticmethod
+    def check_tags(tags):
+        tags_list = []
+        for item in tags:
+            tag = Tag.objects.filter(tags=item).first()
+            if not tag:
+                tag = Tag.objects.create(tags=item)
+                tags_list.append(tag)
+        return tags_list
 
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        tags = serializer.validated_data.get('tags')
+
+
+        article = serializer.save(user=self.request.user, tags=self.check_tags(tags))
+        serializer = self.serializer_class(article, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        tags = serializer.validated_data.get('tags')
+        article = serializer.save(user=self.request.user, tags=self.check_tags(tags))
+        serializer = self.serializer_class(article, context={'request': request})
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
 
 
